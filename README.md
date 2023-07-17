@@ -10,6 +10,14 @@ cd side-voter
 make clean && make
 ```
 
+Build binary with docker
+
+```shell
+git clone https://github.com/polynetwork/side-voter.git
+cd side-voter
+make build
+```
+
 ### Run
 
 Before running, you need feed the configuration file `config.json`.
