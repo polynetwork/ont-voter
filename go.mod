@@ -6,6 +6,7 @@ require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/ethereum/go-ethereum v1.9.15
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
+	github.com/ontio/ontology-go-sdk v1.11.4
 	github.com/polynetwork/eth-contracts v0.0.0-20200814062128-70f58e22b014
 	github.com/polynetwork/poly v1.8.3
 	github.com/polynetwork/poly-go-sdk v0.0.0-20210114120411-3dcba035134f
@@ -30,6 +31,7 @@ require (
 	github.com/confio/ics23/go v0.6.6 // indirect
 	github.com/cosmos/cosmos-sdk v0.39.1 // indirect
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dchest/siphash v1.2.1 // indirect
 	github.com/deckarep/golang-set v0.0.0-20180603214616-504e848d77ea // indirect
@@ -70,6 +72,7 @@ require (
 	github.com/ontio/ontology v1.11.1-0.20200812075204-26cf1fa5dd47 // indirect
 	github.com/ontio/ontology-crypto v1.0.9 // indirect
 	github.com/ontio/ontology-eventbus v0.9.1 // indirect
+	github.com/ontio/wagon v0.4.1 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7 // indirect
@@ -80,8 +83,11 @@ require (
 	github.com/prometheus/tsdb v0.7.1 // indirect
 	github.com/renlulu/gozilliqa-sdklegacy v0.0.0-20220127085552-852a2675dc93 // indirect
 	github.com/rjeczalik/notify v0.9.1 // indirect
+	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/sasha-s/go-deadlock v0.2.1-0.20190427202633-1595213edefa // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v2.20.5-0.20200531151128-663af789c085+incompatible // indirect
+	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/starcoinorg/starcoin-go v0.0.0-20220105024102-530daedc128b // indirect
 	github.com/status-im/keycard-go v0.0.0-20190316090335-8537d3370df4 // indirect
 	github.com/steakknife/bloomfilter v0.0.0-20180922174646-6819c0d2a570 // indirect
@@ -96,6 +102,7 @@ require (
 	github.com/tendermint/tendermint v0.33.7 // indirect
 	github.com/tendermint/tm-db v0.5.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
+	github.com/urfave/cli v1.22.4 // indirect
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208 // indirect
 	github.com/zquestz/grab v0.0.0-20190224022517-abcee96e61b1 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect

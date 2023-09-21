@@ -21,97 +21,87 @@ package voter
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	ontcommon "github.com/ontio/ontology-go-sdk/common"
+	polycommon "github.com/polynetwork/poly/common"
 	"math/big"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
-type heightReq struct {
-	JSONRPC string   `json:"jsonrpc"`
-	Method  string   `json:"method"`
-	Params  []string `json:"params"`
-	ID      uint     `json:"id"`
+func ontevmGetCurrentHeight(client *ontology_go_sdk.OntologySdk) (height uint64, err error) {
+	h, err := client.GetCurrentBlockHeight()
+	return uint64(h), err
 }
 
-type heightRep struct {
-	JSONRPC string `json:"jsonrpc"`
-	Result  string `json:"result"`
-	ID      uint   `json:"id"`
+func HexStringReverse(value string) string {
+	aa, _ := hex.DecodeString(value)
+	bb := HexReverse(aa)
+	return hex.EncodeToString(bb)
 }
 
-type headerRep struct {
-	JSONRPC string `json:"jsonrpc"`
-	Result  *struct {
-		Number string
+func HexReverse(arr []byte) []byte {
+	l := len(arr)
+	x := make([]byte, 0)
+	for i := l - 1; i >= 0; i-- {
+		x = append(x, arr[i])
 	}
-	ID uint `json:"id"`
+	return x
 }
 
-func ethGetCurrentHeight(url string, finalized bool) (height uint64, err error) {
-	if finalized {
-		return ethGetBlockByNumberFinalized(url)
-	}
-	return ethBlockNumber(url)
+type StorageLog struct {
+	Address common.Address
+	Topics  []common.Hash
+	Data    []byte
 }
 
-func ethBlockNumber(url string) (height uint64, err error) {
-	req := &heightReq{
-		JSONRPC: "2.0",
-		Method:  "eth_blockNumber",
-		Params:  make([]string, 0),
-		ID:      1,
+func (self *StorageLog) Deserialization(source *polycommon.ZeroCopySource) error {
+	address, eof := source.NextAddress()
+	if eof {
+		return fmt.Errorf("StorageLog.address eof")
 	}
-	data, _ := json.Marshal(req)
-
-	body, err := jsonRequest(url, data)
-	if err != nil {
-		return
+	self.Address = common.Address(address)
+	l, eof := source.NextUint32()
+	if eof {
+		return fmt.Errorf("StorageLog.l eof")
 	}
-	var resp heightRep
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return
+	self.Topics = make([]common.Hash, 0, l)
+	for i := uint32(0); i < l; i++ {
+		h, _ := source.NextHash()
+		if eof {
+			return fmt.Errorf("StorageLog.h eof")
+		}
+		self.Topics = append(self.Topics, common.Hash(h))
 	}
-	height, err = strconv.ParseUint(resp.Result, 0, 64)
-	if err != nil {
-		return
+	data, eof := source.NextVarBytes()
+	if eof {
+		return fmt.Errorf("StorageLog.Data eof")
 	}
-	return
+	self.Data = data
+	return nil
 }
 
-func ethGetBlockByNumberFinalized(url string) (number uint64, err error) {
-	req := map[string]interface{}{
-		"jsonrpc": "2.0",
-		"method":  "eth_getBlockByNumber",
-		"params":  []interface{}{"finalized", false},
-		"id":      1,
-	}
-	data, _ := json.Marshal(req)
-	body, err := jsonRequest(url, data)
-	if err != nil {
-		return
-	}
-
-	var resp headerRep
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return
-	}
-	if resp.Result == nil || resp.Result.Number == "" {
-		err = fmt.Errorf("invalid response %s", string(body))
-		return
-	}
-
-	h, ok := new(big.Int).SetString(strings.TrimPrefix(resp.Result.Number, "0x"), 16)
+func deserializeStorageLog(notify *ontcommon.NotifyEventInfo) (storageLog StorageLog, err error) {
+	states, ok := notify.States.(string)
 	if !ok {
-		err = fmt.Errorf("invalid block number")
+		err = fmt.Errorf("err States.(string)")
 		return
 	}
-	number = h.Uint64()
+	var data []byte
+	data, err = hexutil.Decode(states)
+	if err != nil {
+		return
+	}
+	source := polycommon.NewZeroCopySource(data)
+	err = storageLog.Deserialization(source)
+	if err != nil {
+		return
+	}
+	if len(storageLog.Topics) == 0 {
+		err = fmt.Errorf("err storageLog.Topics is 0")
+		return
+	}
 	return
 }
 
@@ -120,15 +110,4 @@ func encodeBigInt(b *big.Int) string {
 		return "00"
 	}
 	return hex.EncodeToString(b.Bytes())
-}
-
-func jsonRequest(url string, data []byte) (result []byte, err error) {
-	resp, err := http.Post(url, "application/json", strings.NewReader(string(data)))
-	if err != nil {
-		return
-	}
-
-	defer resp.Body.Close()
-
-	return ioutil.ReadAll(resp.Body)
 }
