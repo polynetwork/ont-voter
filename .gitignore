@@ -1,0 +1,6 @@
+/Log
+*.dat
+*.json
+/db
+.idea
+side-voter
